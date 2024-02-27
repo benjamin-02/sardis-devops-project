@@ -2,7 +2,7 @@
 
 ## Setup Dev Environment:
 
-I am using an Ubuntu shell and VS Code. Following tools will be required for this project:
+I am using an Ubuntu and VS Code. Following tools will be required for this project:
 
 - gclod CLI: for creating GKE environment
 - kubectl: for managing GKE cluster
@@ -44,16 +44,36 @@ Run:
 podman run -d -p 8080:80  benjamindckr/sardis:v1
 ```
 
-## 
+## 2. Set Up a GKE cluster
 
-
-
-
-## Deployment
-
+lauch the dev environemt container:
 ```
-podman 
+podman exec -it bash bash
+```
+
+connect gcloud cli to GCP account and create a new project: 
+```
+gcloud auth login --no-launch-browser
+# follow the instructions ...
+
+gcloud projects create sardis-240227 --name="sardis"
+gcloud config set project sardis-240227
+```
+
+( Link billing account of not linked with the project:
+gcloud beta billing projects link Project-ID --billing-account=xxxxxx-yyyyyy-xxxxxx)
+
+create a cluster:
+```
+gcloud services enable compute.googleapis.com
+gcloud services enable container.googleapis.com
+gcloud container clusters create sardis \
+    --num-nodes=1 \
+    --machine-type=e2-small \
+    --zone=us-central1-a \
+    --cluster-version latest
 ```
 
 ## Status
 
+Working on GKE Cluster
