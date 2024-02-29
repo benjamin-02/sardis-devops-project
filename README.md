@@ -93,7 +93,7 @@ gcloud container clusters delete sardis --location us-central1-a
 Web application: JS, HTML, CSS (nodejs)
 Backed: python, flask
 Postman / curl
-	- Containerize the app (Two Dockerfiles) ->  (Sadece iki docker container ile test). 
+	- Containerize the app (Two Dockerfiles) ->  (test locally with 2 container). 
 	- Write Kubernetes YAML files for deploying the application to the GKE
 
 ## Status
