@@ -4,15 +4,10 @@
 
 I am using an Ubuntu and VS Code. Following tools will be required for this project:
 
-- gclod CLI: for creating GKE environment
-- kubectl: for managing GKE cluster
 - docker/podman: for building the Dockerfile and testing image locally
+- gcloud CLI: for creating GKE environment
+- kubectl: for managing GKE cluster
 - python & flask
-
-
-### podman
-
-
 
 ### gcloud CLI & kubectl
 For Ubuntu 22.04:
@@ -22,7 +17,7 @@ sudo apt-get install apt-transport-https ca-certificates gnupg curl sudo -y
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 sudo apt-get update && sudo apt-get install google-cloud-cli
-sudo apt-get install kubectl
+sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin kubectl
 ```
 
 Here is the official documentation for other ubuntu versions/distros as well:
@@ -31,27 +26,28 @@ https://cloud.google.com/sdk/docs/install#installation_instructions
 
 # Tasks
 
-## 1. Dockerized Hello World App
+## 1. Write a dockerized Hello World App and deploy locally: 
 
-Write the Dockerfile and build it from local termianl:
-```
-podman build -t benjamindckr/sardis:v1 .
-podman login docker.io
-podman push docker.io/benjamindckr/sardis:v1
-```
 Run:
 ```
-podman run -d -p 8080:80  benjamindckr/sardis:v1
+podman run -d -p 8080:80  benjamindckr/sardis:latest
 ```
+launch it with:
+http://localhost:8080
 
-## 2. Set Up a GKE cluster
+
+## 2. Set Up a GKE cluster and deploy the app on GKE
 
 lauch the dev environemt container:
 ```
-podman exec -it bash bash
+#podman run --name bash -d -it ubuntu
+#podman exec -it bash bash
+
+podman run --name dev -d -it benjamindckr/sardis-dev-ctnr
+podman exec -it dev bash
 ```
 
-connect gcloud cli to GCP account and create a new project: 
+from the cdev container, connect gcloud cli to GCP account and create a new project: 
 ```
 gcloud auth login --no-launch-browser
 # follow the instructions ...
@@ -74,6 +70,31 @@ gcloud container clusters create sardis \
     --cluster-version latest
 ```
 
+
+```
+git clone https://github.com/benjamin-02/sardis-devops-project.git
+cd sardis-devops-project
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl get service sardis-svc
+```
+copy the external ip from the output of the command above.
+launch the app with:
+http://<EXTERNAL_IP>:8080 
+
+
+to delete the cluster:
+```
+gcloud container clusters delete sardis --location us-central1-a
+```
+
+## 3. Develop a quote generator web app and deploy it on GKE
+Web application: JS, HTML, CSS (nodejs)
+Backed: python, flask
+Postman / curl
+	- Containerize the app (Two Dockerfiles) ->  (Sadece iki docker container ile test). 
+	- Write Kubernetes YAML files for deploying the application to the GKE
+
 ## Status
 
-Working on GKE Cluster
+Working on 3. Task
