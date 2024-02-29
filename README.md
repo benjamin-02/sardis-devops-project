@@ -72,12 +72,13 @@ gcloud container clusters create sardis \
 
 
 ```
-git clone https://github.com/benjamin-02/sardis-devops-project.git
-cd sardis-devops-project
+git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
+sleep 60 # it takes some time for gcp to attach external IP to the service
 kubectl get service sardis-svc
 ```
+
 copy the external ip from the output of the command above.
 launch the app with:
 http://<EXTERNAL_IP>:8080 
