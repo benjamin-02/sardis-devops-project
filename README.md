@@ -70,7 +70,7 @@ gcloud container clusters create sardis \
     --cluster-version latest
 ```
 
-
+clone the repo and deploy the app as a k8s deployment and service on GKE
 ```
 git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project
 kubectl apply -f deployment.yaml
