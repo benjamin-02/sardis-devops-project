@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Generator</title>
+</head>
+<body>
+    <h1>Random Quote Generator</h1>
+    <div id="quote-container">
+        <p id="quote"></p>
+    </div>
+    <button onclick="getQuote()">Generate Quote</button>
+
+    <script>
+        async function getQuote() {
+            try {
+                const response = await fetch('http://mybackend:5000/quote');
+                const data = await response.json();
+                document.getElementById('quote').textContent = data.quote;
+            } catch (error) {
+                console.error('Error fetching quote:', error);
+            }
+        }
+    </script>
+</body>
+</html>
