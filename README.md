@@ -72,7 +72,7 @@ gcloud container clusters create sardis \
 
 clone the repo and deploy the app as a k8s deployment and service on GKE
 ```
-git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project
+git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/hello_world_service
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 sleep 60 # it takes some time for gcp to attach external IP to the service
