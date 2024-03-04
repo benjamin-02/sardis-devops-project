@@ -36,7 +36,7 @@ launch it with:
 http://localhost:8080
 
 
-## 2. Set Up a GKE cluster and deploy the app on GKE
+## 2. Set Up a GKE cluster
 
 lauch the dev environemt container:
 ```
@@ -70,6 +70,8 @@ gcloud container clusters create sardis \
     --cluster-version latest
 ```
 
+## 3. Deploy the hello world app on GKE
+
 clone the repo and deploy the app as a k8s deployment and service on GKE
 ```
 git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/hello_world_service
@@ -87,15 +89,40 @@ http://<EXTERNAL_IP>:8080
 ( to delete the cluster: `gcloud container clusters delete sardis --location us-central1-a` )
 
 
-## 3. Develop a quote generator web app and deploy it on GKE
+## 4. Develop a quote generator web app and deploy it on GKE
 Web application: JS, HTML, CSS (nodejs)
 Backed: python, flask
 Postman / curl
 	- Containerize the app (Two Dockerfiles) ->  (test locally with 2 container). 
 	- Write Kubernetes YAML files for deploying the application to the GKE
 
+### Deploy to GKE
+
+login to dev env: `podman exec -it dev bash`
+
+first the backend pod:
+```
+git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/back_end
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+then, inside the cluster, the URL (with the service name):  http://sardis-be-svc:5000/quote should reutrn a quote.
 
 
+
+
+## docker images:
+backend:
+docker.io/benjamindckr/sardis-be:latest
+
+front end:
+docker.io/benjamindckr/sardis-fe:latest
+
+dev container:
+docker.io/benjamindckr/sardis-dev-ctnr:latest
+
+hello world app:
+docker.io/benjamindckr/sardis:latest
 
 
 ## Status
