@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sardis-fe
+  name: sardis-fe-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sardis-fe
+  template:
+    metadata:
+      labels:
+        app: sardis-fe
+    spec:
+      containers:
+      - image: benjamindckr/sardis-fe:latest
+        name: sardis-fe
+        ports:
+        - containerPort: 3000
