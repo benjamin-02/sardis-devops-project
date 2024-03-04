@@ -100,7 +100,7 @@ Postman / curl
 
 login to dev env: `podman exec -it dev bash`
 
-first the backend pod:
+first the backend deployment and backend service:
 ```
 git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/back_end
 kubectl apply -f deployment.yaml
@@ -109,7 +109,16 @@ kubectl apply -f service.yaml
 then, inside the cluster, the URL (with the service name):  http://sardis-be-svc:5000/quote should reutrn a quote.
 so we will call this URL from our front end.
 
-
+now the frontend deployment and the frontend service:
+```
+cd sardis-devops-project/front_end
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+with `kubectl get service sardis-fe-svc` the External IP address of this loadbalancer service should be printed and using this IP 
+http://<EXTERNAL-IP>
+the quote generator application can be used. (since the front end service runs on port 80 there is no need to specify port number in the URL.)
+  
 
 ## docker images:
 backend:
