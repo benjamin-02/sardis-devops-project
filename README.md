@@ -116,7 +116,7 @@ kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 ```
 with `kubectl get service sardis-fe-svc` the External IP address of this loadbalancer service should be printed and using this IP 
-http://<EXTERNAL-IP>
+http://EXTERNAL-IP
 the quote generator application can be used. (since the front end service runs on port 80 there is no need to specify port number in the URL.)
   
 
