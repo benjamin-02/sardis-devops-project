@@ -107,7 +107,7 @@ kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 ```
 then, inside the cluster, the URL (with the service name):  http://sardis-be-svc:5000/quote should reutrn a quote.
-
+so we will call this URL from our front end.
 
 
 
