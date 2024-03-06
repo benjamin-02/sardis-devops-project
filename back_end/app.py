@@ -1,8 +1,11 @@
 # app.py
 from flask import Flask, jsonify
+from flask_cors import CORS  # Import CORS
 import random
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS on the Flask app
+
 
 # Sample quotes
 quotes = [
