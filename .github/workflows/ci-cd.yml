@@ -23,7 +23,7 @@ jobs:
         with:
             context: front_end
             push: true
-            tags: user/app:latest, user/app:${{ github.run_number }}
+            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/ghactionstest1:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/ghactionstest1:${{ github.run_number }}
       - run: |
           echo "-------done-------"
 
