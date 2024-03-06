@@ -96,7 +96,7 @@ Postman / curl
 	- Containerize the app (Two Dockerfiles) ->  (test locally with 2 container). 
 	- Write Kubernetes YAML files for deploying the application to the GKE
 
-### Deploy to GKE
+### Deploy manually to GKE
 
 login to dev env: `podman exec -it dev bash`
 
@@ -119,6 +119,67 @@ with `kubectl get service sardis-fe-svc` the External IP address of this loadbal
 http://EXTERNAL-IP
 the quote generator application can be used. (since the front end service runs on port 80 there is no need to specify port number in the URL.)
   
+
+
+
+## 5. Implement CICD Using Github Actions
+	- Implement basic CI/CD using GitHub Actions
+        - Build Docker images
+        - Deploy to GKE
+	    - Test the pipeline
+	    - seperate deployment for the dev branch [second cluster for beta]
+
+### Create Secrets for Docker Hub
+Login to docker hub, then:
+Click on profile picture > My Account
+Security (on the left) > Acess Tokens > New Access Token
+
+give a name to the token, give read and write permissions to the token and generate it!
+
+The token is visible only at this point and after copy and close it wont be shown again. copy it, we will paste it to the github secrets. 
+
+Now go to github repo settings > Security, Secrets and variables (on the left panel)  > Actions  > New Repository Secret
+
+give the secret a name: `DOCKER_HUB_ACCESS_TOKEN` and paste the token from docker hub to the secret field and click on add secret button.
+
+we will need to create another secret. for that again, same procedure. secret name: `DOCKER_HUB_USERNAME` and the username in the secret field. 
+
+this is the block we will need in the `.github/workflows/ci-cd.yaml` file to login to dockerhub: 
+```
+jobs: 
+  pushonmain: 
+    runs-on: ubuntu-latest 
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+```
+
+following block helps building pushing the image to docker hub to the given repo name:
+```
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: front_end
+            push: true
+            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}
+```
+
+and this part makes sure, if there is a change on main branch in the front_end directory, the ci pipeline will run:
+```
+on: 
+  push: 
+    branches: 
+      - main
+    paths:
+      - 'front_end/**'
+```
+
+
 
 ## docker images:
 backend:
