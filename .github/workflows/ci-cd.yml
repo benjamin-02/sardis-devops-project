@@ -18,6 +18,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: front_end
+            push: true
+            tags: user/app:latest, user/app:${{ github.run_number }}
       - run: |
           echo "-------done-------"
 
