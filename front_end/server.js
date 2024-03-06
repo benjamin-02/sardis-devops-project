@@ -1,4 +1,3 @@
-
 // server.js
 const http = require('http');
 const fs = require('fs');
@@ -27,6 +26,17 @@ const server = http.createServer((req, res) => {
                 res.end('Internal Server Error');
             } else {
                 res.writeHead(200, { 'Content-Type': 'text/javascript' });
+                res.end(data);
+            }
+        });
+    } else if (req.url === '/styles.css') {
+        // Serve styles.css file
+        fs.readFile(path.join(__dirname, 'public', 'styles.css'), (err, data) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/css' });
                 res.end(data);
             }
         });
