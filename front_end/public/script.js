@@ -5,8 +5,9 @@ async function getQuote() {
     
     try {
         // Get backend URL from environment variable SARDIS_BACKEND_URL
-        const backendUrl = process.env.SARDIS_BACKEND_URL;
-        const response = await fetch(backendUrl);
+        // const backendUrl = process.env.SARDIS_BACKEND_URL;
+        // const response = await fetch(backendUrl);
+        const response = await fetch('http://mybackend:5000/quote');
         const data = await response.json();
         // Hide loading spinner
         document.getElementById('loader').style.display = 'none';
