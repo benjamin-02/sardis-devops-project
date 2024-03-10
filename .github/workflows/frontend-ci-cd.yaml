@@ -1,0 +1,68 @@
+name: Frontend CI-CD Pipeline
+
+on: 
+  push: 
+    branches: 
+      - main
+    paths:
+      - 'front_end/**'
+
+jobs: 
+  build-and-push-image: 
+    runs-on: ubuntu-latest 
+    steps: 
+      - 
+        run: |
+          echo "-------starting-------"
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: front_end
+            push: true
+            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}
+            # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
+      - 
+        run: |
+          echo "-------done-------"
+
+  deploy:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: sardis-240227
+      GKE_CLUSTER: sardis       # Add your cluster name here.
+      GKE_ZONE: us-central1-a   # Add your cluster zone here.
+      #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+      #IMAGE: static-site
+
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        # Get the GKE credentials so we can deploy to the cluster
+        name: GKE credentials
+        uses: google-github-actions/get-gke-credentials@db150f2cc60d1716e61922b832eae71d2a45938f
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+      - 
+        # Deploy the Docker image to the GKE cluster
+        name: Deploy
+        working-directory: front_end
+        run: |
+          sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}|g" deployment.yaml
+          cat deployment.yaml  # Verify the updated manifest
+          kubectl apply -f deployment.yaml 

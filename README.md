@@ -181,6 +181,54 @@ on:
 
 
 
+
+### Implement CD Pipeline
+
+There are some prerequisites for this step i.e. Google Service Account and and storing its keys as Github Secret.
+
+Creating the project and cluster was already done in the previous steps. In a production Apllication, this can be done with a bootstrap script. 
+
+we will only do the deployment process of the application here in this step, not the deployment of the infrastructure. 
+
+But the service account etc. can be implemented in the bootstrapping script too. 
+
+login to the dev container and:
+```
+# Assign the project name and the service account name to the corresponding variables
+GKE_PROJECT=sardis-240227
+SA_NAME=sardis-service-account
+
+# Create Service Account
+gcloud iam service-accounts create $SA_NAME
+
+# Add roles
+gcloud iam service-accounts list
+SA_EMAIL=$(gcloud iam service-accounts list | grep $SA_NAME | awk -F' ' '{ print $1 }')
+gcloud projects add-iam-policy-binding $GKE_PROJECT \
+  --member=serviceAccount:$SA_EMAIL \
+  --role=roles/container.admin
+<!-- gcloud projects add-iam-policy-binding $GKE_PROJECT \
+  --member=serviceAccount:$SA_EMAIL \
+  --role=roles/storage.admin
+gcloud projects add-iam-policy-binding $GKE_PROJECT \
+  --member=serviceAccount:$SA_EMAIL \
+  --role=roles/container.clusterViewer -->
+
+# Download the JSON keyfile for the service account:
+gcloud iam service-accounts keys create key.json --iam-account=$SA_EMAIL
+
+# show the key
+cat key.json | base64 -w 0
+# and copy it
+# now we can delete it 
+rm -f key.json
+```
+
+create a new repository secret in github secrets, named `GKE_SA_KEY` and paste the key as the value of it
+
+
+
+
 ## docker images:
 backend:
 docker.io/benjamindckr/sardis-be:latest
