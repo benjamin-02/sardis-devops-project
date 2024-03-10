@@ -63,7 +63,7 @@ jobs:
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: $GKE_CLUSTER
-          location: $GKE_ZONE
+          location: 'us-central1-a'
       - 
         # Deploy the Docker image to the GKE cluster
         name: Deploy
