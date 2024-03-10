@@ -76,4 +76,4 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
-          kubectl get service -o wide
+          kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
