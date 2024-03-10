@@ -62,7 +62,9 @@ jobs:
         name: Get GKE credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
-          cluster_name: $GKE_CLUSTER
+          # cluster_name: $GKE_CLUSTER   ??? not working
+          cluster_name: 'sardis'
+          # location: $GKE_ZONE     ??? not working 
           location: 'us-central1-a'
       - 
         # Deploy the Docker image to the GKE cluster
