@@ -40,9 +40,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GCLOUD_PROJECT: sardis-240227
+      GCLOUD_PROJECT: 'sardis-240227'
       GKE_CLUSTER: sardis       # Add your cluster name here.
-      GKE_ZONE: us-central1-a   # Add your cluster zone here.
+      GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
       #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
       #IMAGE: static-site
 
@@ -56,14 +56,14 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GKE_SA_KEY }}'
-          project_id: $GCLOUD_PROJECT
+          #project_id: $GCLOUD_PROJECT
       - 
         # Get the GKE credentials configure kubectl so we can deploy to the cluster
         name: Get GKE credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: $GKE_CLUSTER
-          #location: $GKE_ZONE
+          location: $GKE_ZONE
       - 
         # Deploy the Docker image to the GKE cluster
         name: Deploy
