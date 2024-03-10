@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_ID: sardis-240227
+      GCLOUD_PROJECT: sardis-240227
       GKE_CLUSTER: sardis       # Add your cluster name here.
       GKE_ZONE: us-central1-a   # Add your cluster zone here.
       #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
