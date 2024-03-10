@@ -56,6 +56,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GKE_SA_KEY }}'
+          project_id: $GCLOUD_PROJECT
       - 
         # Get the GKE credentials configure kubectl so we can deploy to the cluster
         id: 'get-credentials'
