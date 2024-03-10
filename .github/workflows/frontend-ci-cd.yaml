@@ -1,11 +1,17 @@
 name: Frontend CI-CD Pipeline
 
+# This worlflow will run if any push to main br. front_end directory 
+# OR if the backend cicd pipeline runs
 on: 
   push: 
     branches: 
       - main
     paths:
       - 'front_end/**'
+  workflow_run:
+    workflows: ["Backend CI-CD Pipeline"]
+    types:
+      - completed
 
 jobs: 
   build-and-push-image: 
