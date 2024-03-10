@@ -9,10 +9,11 @@ CORS(app)  # Enable CORS on the Flask app
 # Sample quotes
 quotes = [
     "The only way to do great work is to love what you do. – Steve Jobs",
+    "The strong person is not the one who can overpower others, but the one who controls himself when angry. – Prophet Muhammad (PBUH)",
     "Life is what happens when you're busy making other plans. – John Lennon",
     "Get busy living or get busy dying. – Stephen King",
     "You only live once, but if you do it right, once is enough. – Mae West",
-    "The purpose of our lives is to be happy. – Dalai Lama",
+    "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. – Albert Einstein",
     "You miss 100% of the shots you don’t take. – Wayne Gretzky",
     "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill"
 ]
