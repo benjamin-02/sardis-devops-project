@@ -59,11 +59,11 @@ jobs:
           project_id: $GCLOUD_PROJECT
       - 
         # Get the GKE credentials configure kubectl so we can deploy to the cluster
-        id: 'get-credentials'
+        name: Get GKE credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: $GKE_CLUSTER
-          location: $GKE_ZONE
+          #location: $GKE_ZONE
       - 
         # Deploy the Docker image to the GKE cluster
         name: Deploy
