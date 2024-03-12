@@ -46,6 +46,9 @@ jobs:
       #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
       #IMAGE: static-site
 
+    outputs:
+      output1: ${{ steps.get_external_ip.outputs.test }}
+
     steps:
       - 
         name: Checkout code
@@ -82,10 +85,10 @@ jobs:
         name: Get External IP
         id: get_external_ip
         run: |
-          EXTERNAL_BACKEND_IP=$(kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)
-          echo "name=$EXTERNAL_BACKEND_IP" >> $GITHUB_OUTPUT
+          external_ip=$(kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)
+          echo "Eexternal_backend_ip=$external_ip" >> $GITHUB_OUTPUT
           
-      # - 
-      #   # Save the external IP as a repository variable
-      #   name: Save External IP
-      #   run: echo "EXTERNAL_BACKEND_IP=${{ steps.get_external_ip.outputs.external_ip }}" >> $GITHUB_ENV
+      - 
+        # Save the external IP as a repository variable
+        name: Save External IP
+        run: echo "EXTERNAL_BACKEND_IP=${{ steps.get_external_ip.outputs.external_backend_ip }}" >> $GITHUB_ENV
