@@ -17,5 +17,8 @@ spec:
       containers:
       - image: benjamindckr/sardis-fe:latest
         name: sardis-fe
+        env:
+        - name: SARDIS_BACKEND_IP
+          value: 0.0.0.0
         ports:
         - containerPort: 3000

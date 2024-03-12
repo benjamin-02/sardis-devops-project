@@ -79,6 +79,8 @@ jobs:
         run: |
           sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}-dev|g" deployment.yaml
           cat deployment.yaml  # Verify the updated manifest
+          sed -i "s|0.0.0.0|${{ vars.EXTERNAL_BACKEND_IP }}|g" deployment.yaml
+          cat deployment.yaml  # Verify the updated manifest
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
