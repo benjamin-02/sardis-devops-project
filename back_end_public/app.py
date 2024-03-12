@@ -16,8 +16,8 @@ quotes = [
     "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. – Albert Einstein",
     "You miss 100% of the shots you don’t take. – Wayne Gretzky",
     "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill",
-    "A room without books is like a body without a soul. – Marcus Tullius Cicero"
-    # "Kindness is a mark of faith, and whoever is not kind has no faith. – Prophet Muhammad"
+    "A room without books is like a body without a soul. – Marcus Tullius Cicero", 
+    "Kindness is a mark of faith, and whoever is not kind has no faith. – Prophet Muhammad"
 ]
 
 @app.route('/quote')
