@@ -82,7 +82,7 @@ jobs:
         name: Get External IP
         id: get_external_ip
         run: |
-          EXTERNAL_BACKEND_IP=$(kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)
+          EXTERNAL_BACKEND_IP=$(kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)
           echo "name=$EXTERNAL_BACKEND_IP" >> $GITHUB_OUTPUT
           
       # - 
