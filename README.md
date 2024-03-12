@@ -63,10 +63,12 @@ create a cluster:
 ```
 gcloud services enable compute.googleapis.com
 gcloud services enable container.googleapis.com
-gcloud container clusters create sardis \
+gcloud container clusters create sardis-dev \
     --num-nodes=1 \
     --machine-type=e2-small \
     --zone=us-central1-a \
+    --disk-type=pd-standard \
+    --disk-size=50 \
     --cluster-version latest
 ```
 
@@ -245,4 +247,4 @@ docker.io/benjamindckr/sardis:latest
 
 ## Status
 
-Working on 4. Task
+Working on 5. Task
