@@ -63,6 +63,17 @@ create a cluster:
 ```bash
 gcloud services enable compute.googleapis.com
 gcloud services enable container.googleapis.com
+gcloud container clusters create sardis \
+    --num-nodes=1 \
+    --machine-type=e2-small \
+    --zone=us-central1-a \
+    --disk-type=pd-standard \
+    --disk-size=50 \
+    --cluster-version latest
+```
+
+(and another cluster for separate dev branch deployments:
+```bash
 gcloud container clusters create sardis-dev \
     --num-nodes=1 \
     --machine-type=e2-small \
@@ -71,6 +82,7 @@ gcloud container clusters create sardis-dev \
     --disk-size=50 \
     --cluster-version latest
 ```
+)
 
 ## 3. Deploy the hello world app on GKE
 
