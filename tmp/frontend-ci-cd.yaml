@@ -1,0 +1,85 @@
+name: Frontend CI-CD Pipeline
+
+# This worlflow will run if any push to main br. front_end directory 
+# OR if the backend cicd pipeline runs
+on: 
+  push: 
+    branches: 
+      - main
+    paths:
+      - 'front_end/**'
+  workflow_run:
+    workflows: ["Backend CI-CD Pipeline"]
+    types:
+      - completed
+
+jobs: 
+  build-and-push-image: 
+    runs-on: ubuntu-latest 
+    steps: 
+      - 
+        run: |
+          echo "-------starting-------"
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: front_end
+            push: true
+            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}
+            # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
+      - 
+        run: |
+          echo "-------done-------"
+
+  deploy:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+
+    env:
+      GCLOUD_PROJECT: 'sardis-240227'
+      GKE_CLUSTER: sardis       # Add your cluster name here.
+      GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
+      #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+      #IMAGE: static-site
+
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        # Authenticate to GCP
+        name: Authenticate to GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+          #project_id: $GCLOUD_PROJECT
+      - 
+        # Get the GKE credentials configure kubectl so we can deploy to the cluster
+        name: Get GKE credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          # cluster_name: $GKE_CLUSTER   ??? not working
+          cluster_name: 'sardis'
+          # location: $GKE_ZONE     ??? not working 
+          location: 'us-central1-a'
+      - 
+        # Deploy the Docker image to the GKE cluster
+        name: Deploy
+        working-directory: front_end
+        run: |
+          sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}|g" deployment.yaml
+          cat deployment.yaml  # Verify the updated manifest
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          sleep 60
+          kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
