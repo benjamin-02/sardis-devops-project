@@ -122,14 +122,14 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       -
-        name: set backend url
+        name: Set Backend URL in JS
         working-directory: front_end/public
         env:
           EXTERNAL_BACKEND_IP: ${{ needs.deploy-backend.outputs.external_backend_ip }}
         run: |
           echo $EXTERNAL_BACKEND_IP
-          sed -i "s|REPLACE-THIS|$EXTERNAL_BACKEND_IP|g" config.js
-          cat config.js # verify the replacement
+          sed -i "s|REPLACE-THIS|$EXTERNAL_BACKEND_IP|g" script.js
+          cat script.js # verify the replacement
       -  
         name: Build and push
         uses: docker/build-push-action@v5
