@@ -1,4 +1,4 @@
-name: Dev Backend CI-CD Pipeline
+name: Dev Branch CI-CD Pipeline
 
 on: 
   push: 
@@ -8,12 +8,9 @@ on:
       - 'back_end_public/**'
 
 jobs: 
-  build-and-push-image: 
+  build-and-push-be-image: 
     runs-on: ubuntu-latest 
     steps: 
-      - 
-        run: |
-          echo "-------starting-------"
       - 
         name: Checkout code
         uses: actions/checkout@v4
@@ -31,12 +28,9 @@ jobs:
             push: true
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:${{ github.run_number }}-dev
             # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
-      - 
-        run: |
-          echo "-------done-------"
 
-  deploy:
-    needs: build-and-push-image
+  deploy-be:
+    needs: build-and-push-be-image
     runs-on: ubuntu-latest
 
     env:
@@ -47,7 +41,7 @@ jobs:
       #IMAGE: static-site
 
     outputs:
-      output1: ${{ steps.get_external_ip.outputs.test }}
+      external_backend_ip: ${{ steps.get_external_ip.outputs.external_ip }}
 
     steps:
       - 
@@ -81,14 +75,102 @@ jobs:
           kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 
       - 
-        # Get the External IP of backend API
+        # Get the External IP of backend API and save as output
         name: Get External IP
         id: get_external_ip
         run: |
-          external_ip=$(kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)
-          echo "Eexternal_backend_ip=$external_ip" >> $GITHUB_OUTPUT
+          echo "external_ip=$(kubectl get services sardis-be-svc \
+                                      --no-headers \
+                                      -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)" >> $GITHUB_OUTPUT"
           
+      # - 
+      #   # Save the external IP as a repository variable
+      #   name: Save External IP
+      #   run: echo "EXTERNAL_BACKEND_IP=${{ steps.get_external_ip.outputs.external_backend_ip }}" >> $GITHUB_ENV
+
+###########################################################################
+
+# name: Dev Frontend CI-CD Pipeline
+
+# # This workflow will run if any push to main br. front_end directory 
+# # OR if the backend cicd pipeline runs
+# on: 
+#   push: 
+#     branches: 
+#       - dev
+#     paths:
+#       - 'front_end/**'
+#   workflow_run:
+#     workflows: ["Dev Backend CI-CD Pipeline"]
+#     types:
+#       - completed
+
+# jobs: 
+  
+  build-and-push-fe-image: 
+    runs-on: ubuntu-latest 
+    steps: 
       - 
-        # Save the external IP as a repository variable
-        name: Save External IP
-        run: echo "EXTERNAL_BACKEND_IP=${{ steps.get_external_ip.outputs.external_backend_ip }}" >> $GITHUB_ENV
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+            context: front_end
+            push: true
+            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}-dev
+            # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
+
+  deploy:
+    needs: [deploy-be, build-and-push-fe-image]
+    runs-on: ubuntu-latest
+
+    env:
+      GCLOUD_PROJECT: 'sardis-240227'
+      GKE_CLUSTER: sardis-dev       # Add your cluster name here.
+      GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
+      #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+      #IMAGE: static-site
+
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        # Authenticate to GCP
+        name: Authenticate to GCP
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+          #project_id: $GCLOUD_PROJECT
+      - 
+        # Get the GKE credentials configure kubectl so we can deploy to the cluster
+        name: Get GKE credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          # cluster_name: $GKE_CLUSTER   ??? not working
+          cluster_name: 'sardis-dev'
+          # location: $GKE_ZONE     ??? not working 
+          location: 'us-central1-a'
+      - 
+        # Deploy the Docker image to the GKE cluster
+        name: Deploy front-end
+        working-directory: front_end
+        env:
+          EXTERNAL_BACKEND_IP: ${{ needs.deploy-be.outputs.external_backend_ip }}
+        run: |
+          sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}-dev|g" deployment.yaml
+          cat deployment.yaml  # Verify the updated manifest
+          sed -i "s|0.0.0.0|$EXTERNAL_BACKEND_IP|g" deployment.yaml
+          cat deployment.yaml  # Verify the updated manifest
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          sleep 60
+          kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip

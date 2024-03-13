@@ -1,6 +1,6 @@
 name: Dev Frontend CI-CD Pipeline
 
-# This worlflow will run if any push to main br. front_end directory 
+# This workflow will run if any push to main br. front_end directory 
 # OR if the backend cicd pipeline runs
 on: 
   push: 
