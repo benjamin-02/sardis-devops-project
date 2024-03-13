@@ -1,11 +1,12 @@
 // script.js
+import { backendUrl } from './config.js';
 async function getQuote() {
     // Show loading spinner
     document.getElementById('loader').style.display = 'block';
     
     try {
         // Get backend URL from environment variable SARDIS_BACKEND_IP
-        const backendUrl = `${process.env.SARDIS_BACKEND_IP}:5000/quote`;
+        // const backendUrl = `${process.env.SARDIS_BACKEND_IP}:5000/quote`;
         const response = await fetch(backendUrl);
         // const response = await fetch('http://mybackend:5000/quote');
         const data = await response.json();

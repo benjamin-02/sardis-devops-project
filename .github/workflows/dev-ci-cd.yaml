@@ -8,7 +8,7 @@ on:
       - 'back_end_public/**'
 
 jobs: 
-  build-and-push-be-image: 
+  build-and-push-backend-image: 
     runs-on: ubuntu-latest 
     steps: 
       - 
@@ -29,8 +29,8 @@ jobs:
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:${{ github.run_number }}-dev
             # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
 
-  deploy-be:
-    needs: build-and-push-be-image
+  deploy-backend:
+    needs: build-and-push-backend-image
     runs-on: ubuntu-latest
 
     env:
@@ -107,7 +107,7 @@ jobs:
 
 # jobs: 
   
-  build-and-push-fe-image: 
+  build-and-push-frontend-image: 
     runs-on: ubuntu-latest 
     steps: 
       - 
@@ -128,8 +128,8 @@ jobs:
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}-dev
             # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
 
-  deploy:
-    needs: [deploy-be, build-and-push-fe-image]
+  deploy-frontend:
+    needs: [deploy-backend, build-and-push-frontend-image]
     runs-on: ubuntu-latest
 
     env:
@@ -168,8 +168,9 @@ jobs:
         run: |
           sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}-dev|g" deployment.yaml
           cat deployment.yaml  # Verify the updated manifest
-          sed -i "s|0.0.0.0|$EXTERNAL_BACKEND_IP|g" deployment.yaml
-          cat deployment.yaml  # Verify the updated manifest
+          # sed -i "s|0.0.0.0|$EXTERNAL_BACKEND_IP|g" deployment.yaml
+          # cat deployment.yaml  # Verify the updated manifest
+          sed -i "s|REPLACE-THIS|$EXTERNAL_BACKEND_IP|g" public/config.js
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
