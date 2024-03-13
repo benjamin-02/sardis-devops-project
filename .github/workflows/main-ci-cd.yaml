@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'back_end_public/**'
-      # - '.github/workflows/main-ci-cd.yaml'
+      - '.github/workflows/main-ci-cd.yaml'
 
 env:
   GCLOUD_PROJECT: 'sardis-240227'
