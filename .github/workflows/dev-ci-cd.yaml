@@ -13,7 +13,6 @@ env:
   GKE_CLUSTER: sardis-dev       # Add your cluster name here.
   GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
   #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-  #IMAGE: static-site
 
 jobs: 
   build-and-push-backend-image: 
@@ -73,6 +72,7 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
+          echo "Backend IP:"
           kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 
       - 
@@ -119,13 +119,6 @@ jobs:
     needs: build-and-push-frontend-image
     runs-on: ubuntu-latest
 
-    # env:
-    #   GCLOUD_PROJECT: 'sardis-240227'
-    #   GKE_CLUSTER: sardis-dev       # Add your cluster name here.
-    #   GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
-    #   #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-    #   #IMAGE: static-site
-
     steps:
       - 
         name: Checkout code
@@ -156,4 +149,6 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
-          kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
+          echo "============================================"
+          echo "Application URL:"
+          echo "http://${kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip}"
