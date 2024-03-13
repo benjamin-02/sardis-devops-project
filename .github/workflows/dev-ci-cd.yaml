@@ -81,7 +81,7 @@ jobs:
         run: |
           echo "external_ip=$(kubectl get services sardis-be-svc \
                                       --no-headers \
-                                      -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)" >> $GITHUB_OUTPUT"
+                                      -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)" >> "$GITHUB_OUTPUT"
           
       # - 
       #   # Save the external IP as a repository variable
