@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - 'back_end_public/**'
+      - '.github/workflows/dev-ci-cd.yaml'
 
 jobs: 
   build-and-push-backend-image: 
