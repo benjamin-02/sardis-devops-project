@@ -15,7 +15,10 @@ quotes = [
     "You only live once, but if you do it right, once is enough. – Mae West",
     "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. – Albert Einstein",
     "You miss 100% of the shots you don’t take. – Wayne Gretzky",
-    "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill"
+    "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill",
+    "A room without books is like a body without a soul. – Marcus Tullius Cicero", 
+    "Kindness is a mark of faith, and whoever is not kind has no faith. – Prophet Muhammad",
+    "Success is not the key to happiness. Happiness is the key to success. – Albert Schweitzer"
 ]
 
 @app.route('/quote')

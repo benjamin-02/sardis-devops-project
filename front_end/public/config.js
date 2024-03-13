@@ -1,0 +1,1 @@
+export const backendUrl = 'http://REPLACE-THIS:5000/quote';

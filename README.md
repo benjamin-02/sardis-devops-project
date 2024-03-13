@@ -11,7 +11,7 @@ I am using an Ubuntu and VS Code. Following tools will be required for this proj
 
 ### gcloud CLI & kubectl
 For Ubuntu 22.04:
-```
+```bash
 sudo apt-get update
 sudo apt-get install apt-transport-https ca-certificates gnupg curl sudo -y
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
@@ -29,7 +29,7 @@ https://cloud.google.com/sdk/docs/install#installation_instructions
 ## 1. Write a dockerized Hello World App and deploy locally: 
 
 Run:
-```
+```bash
 podman run -d -p 8080:80  benjamindckr/sardis:latest
 ```
 launch it with:
@@ -39,7 +39,7 @@ http://localhost:8080
 ## 2. Set Up a GKE cluster
 
 lauch the dev environemt container:
-```
+```bash
 #podman run --name bash -d -it ubuntu
 #podman exec -it bash bash
 
@@ -48,7 +48,7 @@ podman exec -it dev bash
 ```
 
 from the cdev container, connect gcloud cli to GCP account and create a new project: 
-```
+```bash
 gcloud auth login --no-launch-browser
 # follow the instructions ...
 
@@ -60,20 +60,34 @@ gcloud config set project sardis-240227
 gcloud beta billing projects link Project-ID --billing-account=xxxxxx-yyyyyy-xxxxxx)
 
 create a cluster:
-```
+```bash
 gcloud services enable compute.googleapis.com
 gcloud services enable container.googleapis.com
 gcloud container clusters create sardis \
     --num-nodes=1 \
     --machine-type=e2-small \
     --zone=us-central1-a \
+    --disk-type=pd-standard \
+    --disk-size=50 \
     --cluster-version latest
 ```
+
+(and another cluster for separate dev branch deployments:
+```bash
+gcloud container clusters create sardis-dev \
+    --num-nodes=1 \
+    --machine-type=e2-small \
+    --zone=us-central1-a \
+    --disk-type=pd-standard \
+    --disk-size=50 \
+    --cluster-version latest
+```
+)
 
 ## 3. Deploy the hello world app on GKE
 
 clone the repo and deploy the app as a k8s deployment and service on GKE
-```
+```bash
 git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/hello_world_service
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
@@ -101,7 +115,7 @@ Postman / curl
 login to dev env: `podman exec -it dev bash`
 
 first the backend deployment and backend service:
-```
+```bash
 git clone https://github.com/benjamin-02/sardis-devops-project.git && cd sardis-devops-project/back_end
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
@@ -110,7 +124,7 @@ then, inside the cluster, the URL (with the service name):  http://sardis-be-svc
 so we will call this URL from our front end.
 
 now the frontend deployment and the frontend service:
-```
+```bash
 cd sardis-devops-project/front_end
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
@@ -145,7 +159,7 @@ give the secret a name: `DOCKER_HUB_ACCESS_TOKEN` and paste the token from docke
 we will need to create another secret. for that again, same procedure. secret name: `DOCKER_HUB_USERNAME` and the username in the secret field. 
 
 this is the block we will need in the `.github/workflows/ci-cd.yaml` file to login to dockerhub: 
-```
+```yaml
 jobs: 
   pushonmain: 
     runs-on: ubuntu-latest 
@@ -160,7 +174,7 @@ jobs:
 ```
 
 following block helps building pushing the image to docker hub to the given repo name:
-```
+```yaml
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -170,7 +184,7 @@ following block helps building pushing the image to docker hub to the given repo
 ```
 
 and this part makes sure, if there is a change on main branch in the front_end directory, the ci pipeline will run:
-```
+```yaml
 on: 
   push: 
     branches: 
@@ -193,7 +207,7 @@ we will only do the deployment process of the application here in this step, not
 But the service account etc. can be implemented in the bootstrapping script too. 
 
 login to the dev container and:
-```
+```bash
 # Assign the project name and the service account name to the corresponding variables
 GKE_PROJECT=sardis-240227
 SA_NAME=sardis-service-account
@@ -245,4 +259,4 @@ docker.io/benjamindckr/sardis:latest
 
 ## Status
 
-Working on 4. Task
+Working on 5. Task
