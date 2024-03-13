@@ -151,4 +151,4 @@ jobs:
           sleep 60
           echo "============================================"
           echo "Application URL:"
-          echo "http://${kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip}"
+          echo 'http://${kubectl get services sardis-fe-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip}'
