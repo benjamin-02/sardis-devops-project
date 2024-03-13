@@ -109,6 +109,7 @@ jobs:
 # jobs: 
   
   build-and-push-frontend-image: 
+    needs: deploy-backend
     runs-on: ubuntu-latest 
     steps: 
       - 
@@ -120,7 +121,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - 
+      -
+        name: set backend url
+        working-directory: front_end/public
+        env:
+          EXTERNAL_BACKEND_IP: ${{ needs.deploy-backend.outputs.external_backend_ip }}
+        run: |
+          echo $EXTERNAL_BACKEND_IP
+          sed -i "s|REPLACE-THIS|$EXTERNAL_BACKEND_IP|g" config.js
+          cat config.js # verify the replacement
+      -  
         name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -130,7 +140,7 @@ jobs:
             # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
 
   deploy-frontend:
-    needs: [deploy-backend, build-and-push-frontend-image]
+    needs: build-and-push-frontend-image
     runs-on: ubuntu-latest
 
     env:
@@ -164,15 +174,9 @@ jobs:
         # Deploy the Docker image to the GKE cluster
         name: Deploy front-end
         working-directory: front_end
-        env:
-          EXTERNAL_BACKEND_IP: ${{ needs.deploy-be.outputs.external_backend_ip }}
         run: |
           sed -i "s|benjamindckr/sardis-fe:latest|benjamindckr/sardis-fe:${{ github.run_number }}-dev|g" deployment.yaml
           cat deployment.yaml  # Verify the updated manifest
-          # sed -i "s|0.0.0.0|$EXTERNAL_BACKEND_IP|g" deployment.yaml
-          # cat deployment.yaml  # Verify the updated manifest
-          sed -i "s|REPLACE-THIS|$EXTERNAL_BACKEND_IP|g" public/config.js
-          cat public/config.js # verify the replacement
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
