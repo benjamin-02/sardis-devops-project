@@ -8,6 +8,13 @@ on:
       - 'back_end_public/**'
       - '.github/workflows/dev-ci-cd.yaml'
 
+env:
+  GCLOUD_PROJECT: 'sardis-240227'
+  GKE_CLUSTER: sardis-dev       # Add your cluster name here.
+  GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
+  #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  #IMAGE: static-site
+
 jobs: 
   build-and-push-backend-image: 
     runs-on: ubuntu-latest 
@@ -33,13 +40,6 @@ jobs:
   deploy-backend:
     needs: build-and-push-backend-image
     runs-on: ubuntu-latest
-
-    env:
-      GCLOUD_PROJECT: 'sardis-240227'
-      GKE_CLUSTER: sardis-dev       # Add your cluster name here.
-      GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
-      #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-      #IMAGE: static-site
 
     outputs:
       external_backend_ip: ${{ steps.get_external_ip.outputs.external_ip }}
@@ -83,30 +83,6 @@ jobs:
           echo "external_ip=$(kubectl get services sardis-be-svc \
                                       --no-headers \
                                       -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip)" >> "$GITHUB_OUTPUT"
-          
-      # - 
-      #   # Save the external IP as a repository variable
-      #   name: Save External IP
-      #   run: echo "EXTERNAL_BACKEND_IP=${{ steps.get_external_ip.outputs.external_backend_ip }}" >> $GITHUB_ENV
-
-###########################################################################
-
-# name: Dev Frontend CI-CD Pipeline
-
-# # This workflow will run if any push to main br. front_end directory 
-# # OR if the backend cicd pipeline runs
-# on: 
-#   push: 
-#     branches: 
-#       - dev
-#     paths:
-#       - 'front_end/**'
-#   workflow_run:
-#     workflows: ["Dev Backend CI-CD Pipeline"]
-#     types:
-#       - completed
-
-# jobs: 
   
   build-and-push-frontend-image: 
     needs: deploy-backend
@@ -143,12 +119,12 @@ jobs:
     needs: build-and-push-frontend-image
     runs-on: ubuntu-latest
 
-    env:
-      GCLOUD_PROJECT: 'sardis-240227'
-      GKE_CLUSTER: sardis-dev       # Add your cluster name here.
-      GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
-      #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
-      #IMAGE: static-site
+    # env:
+    #   GCLOUD_PROJECT: 'sardis-240227'
+    #   GKE_CLUSTER: sardis-dev       # Add your cluster name here.
+    #   GKE_ZONE: 'us-central1-a'   # Add your cluster zone here.
+    #   #DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+    #   #IMAGE: static-site
 
     steps:
       - 
