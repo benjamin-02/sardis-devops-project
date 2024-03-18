@@ -4,9 +4,6 @@ on:
   push: 
     branches: 
       - dev
-    paths:
-      - 'back_end_public/**'
-      - '.github/workflows/dev-ci-cd.yaml'
 
 env:
   GCLOUD_PROJECT: 'sardis-240227'
@@ -34,7 +31,6 @@ jobs:
             context: back_end_public
             push: true
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-be:${{ github.run_number }}-dev
-            # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
 
   deploy-backend:
     needs: build-and-push-backend-image
@@ -58,9 +54,7 @@ jobs:
         name: Get GKE credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
-          # cluster_name: $GKE_CLUSTER   ??? not working
           cluster_name: 'sardis-dev'
-          # location: $GKE_ZONE     ??? not working 
           location: 'us-central1-a'
       - 
         # Deploy the Docker image to the GKE cluster
@@ -72,6 +66,7 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           sleep 60
+          echo "============================================"
           echo "Backend IP:"
           kubectl get services sardis-be-svc --no-headers -o custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 
@@ -113,7 +108,6 @@ jobs:
             context: front_end
             push: true
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:latest-dev, ${{ secrets.DOCKER_HUB_USERNAME }}/sardis-fe:${{ github.run_number }}-dev
-            # maybe GITHUB_SHA instead of latest??? latest is not feasible in kubernetes deployment!
 
   deploy-frontend:
     needs: build-and-push-frontend-image
@@ -129,15 +123,12 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GKE_SA_KEY }}'
-          #project_id: $GCLOUD_PROJECT
       - 
         # Get the GKE credentials configure kubectl so we can deploy to the cluster
         name: Get GKE credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
-          # cluster_name: $GKE_CLUSTER   ??? not working
           cluster_name: 'sardis-dev'
-          # location: $GKE_ZONE     ??? not working 
           location: 'us-central1-a'
       - 
         # Deploy the Docker image to the GKE cluster
