@@ -13,6 +13,11 @@ WORKDIR /app
 # Copy all files from the current directory to the working directory
 COPY . .
 
+# Replace the placeholder in script.js with the actual value from .env
+RUN apk add --no-cache sed && \
+    API_URL=$(grep API_URL .env | cut -d '=' -f2) && \
+    sed -i "s|%%API_URL%%|$API_URL|g" public/script.js
+
 # Expose the port the app runs on
 EXPOSE 3000
 
